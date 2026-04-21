@@ -1,0 +1,51 @@
+version: '3.5'
+
+services:
+  chrome_webdriver:
+    container_name: chrome_webdriver
+    image: selenium/standalone-chrome
+    # image: seleniarm/standalone-chromium:latest
+    # ports:
+    #   - '4444:4444'
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://localhost:4444/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    shm_size: '2gb'
+    networks:
+      testing_network:
+        ipv4_address: 10.5.0.2
+    environment:
+      - SE_EVENT_BUS_HOST=chrome_webdriver
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - JAVA_OPTS=-Dwebdriver.chrome.whitelistedIps=
+
+  sl_gui_tests:
+    container_name: sl_gui_tests
+    build: .
+    networks:
+      testing_network:
+        ipv4_address: 10.5.0.3
+    depends_on:
+      chrome_webdriver:
+        condition: service_healthy
+    volumes:
+      - ./allurereport:/app/allure-results:z
+
+  wait-for-completion:
+    container_name: wait-for-completion
+    image: alpine:latest
+    depends_on:
+      sl_gui_tests:
+        condition: service_completed_successfully
+    command: /bin/sh -c "while true; do sleep 10; done"
+
+networks:
+  testing_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1

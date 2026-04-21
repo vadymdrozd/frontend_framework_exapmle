@@ -1,0 +1,4 @@
+question,answer_1,answer_2,answer_1_points, answer_2_points
+prediction with short question,answer_1,answer_2,200,150
+prediction with not very long long long long long long question_2,answer_1,answer_2,1000,1500
+prediction with long long long long long long long long long long long long long long long long long long long long lon 140 symbols question,answer_1,answer_2,10,15

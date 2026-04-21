@@ -1,0 +1,7 @@
+## Preventing copy whole repo
+.dockerignore
+.git
+.gitignore
+README.md
+allurereport
+.github/*
